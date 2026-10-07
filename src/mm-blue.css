@@ -1,0 +1,327 @@
+﻿/* =========================================================
+   MBARE MUSIKA — BLUE BRAND OVERRIDE
+   This file FORCEFULLY replaces the old green/gold palette.
+   ========================================================= */
+
+:root {
+  --mm-blue-950: #031b3d;
+  --mm-blue-900: #062a55;
+  --mm-blue-800: #073f7a;
+  --mm-blue-700: #0759b4;
+  --mm-blue-600: #0867ca;
+  --mm-blue-500: #0874df;
+  --mm-blue-400: #2989df;
+  --mm-blue-300: #55aaf0;
+  --mm-blue-200: #b9ddff;
+  --mm-blue-100: #eaf4ff;
+  --mm-blue-50: #f4f9ff;
+
+  --mm-white: #ffffff;
+  --mm-text: #09264b;
+  --mm-text-soft: #61748c;
+  --mm-border: #dce7f3;
+  --mm-background: #f7f9fc;
+}
+
+/* PAGE */
+body {
+  margin: 0 !important;
+  background: var(--mm-background) !important;
+  color: var(--mm-text) !important;
+}
+
+/* Remove old green/gold styling wherever it exists */
+.mm-page {
+  background: var(--mm-background) !important;
+  color: var(--mm-text) !important;
+}
+
+/* NEWS BAR */
+.mm-news {
+  background: var(--mm-blue-950) !important;
+  color: white !important;
+}
+
+.mm-news-label {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+.live-dot {
+  background: #75c8ff !important;
+}
+
+/* HEADER */
+.mm-header {
+  background: white !important;
+  border-color: var(--mm-border) !important;
+}
+
+.mm-logo-mark {
+  background: linear-gradient(
+    135deg,
+    var(--mm-blue-500),
+    var(--mm-blue-800)
+  ) !important;
+  color: white !important;
+}
+
+/* SEARCH */
+.mm-search {
+  background: var(--mm-blue-50) !important;
+  border-color: var(--mm-border) !important;
+}
+
+.mm-search button {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* NAVIGATION */
+.mm-nav {
+  background: white !important;
+  border-color: var(--mm-border) !important;
+}
+
+.mm-nav a:hover {
+  color: var(--mm-blue-600) !important;
+}
+
+.category-menu {
+  background: var(--mm-blue-100) !important;
+  color: var(--mm-blue-700) !important;
+}
+
+.seller-button {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* HERO */
+.mm-hero {
+  background:
+    radial-gradient(
+      circle at 75% 20%,
+      #cfe9ff 0,
+      transparent 34%
+    ),
+    linear-gradient(
+      110deg,
+      #edf7ff,
+      #ffffff 58%
+    ) !important;
+}
+
+.mm-hero h1 {
+  color: var(--mm-text) !important;
+}
+
+.mm-hero h1 span {
+  color: var(--mm-blue-500) !important;
+}
+
+.hero-tag,
+.section-kicker {
+  color: var(--mm-blue-600) !important;
+}
+
+.primary-button {
+  background: var(--mm-blue-600) !important;
+  border-color: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+.secondary-button {
+  background: white !important;
+  color: var(--mm-blue-800) !important;
+  border-color: var(--mm-border) !important;
+}
+
+.hero-blue-circle {
+  background: linear-gradient(
+    145deg,
+    #bfe2ff,
+    #e9f5ff
+  ) !important;
+}
+
+.hero-price {
+  background: var(--mm-blue-700) !important;
+  color: white !important;
+}
+
+/* TRUST */
+.trust-item strong {
+  color: var(--mm-blue-900) !important;
+}
+
+/* CATEGORY CARDS */
+.category-card {
+  background: white !important;
+  border-color: var(--mm-border) !important;
+}
+
+.category-card:hover,
+.category-card.selected {
+  border-color: #6baee9 !important;
+  box-shadow: 0 12px 30px rgba(21,88,147,.08) !important;
+}
+
+.category-icon {
+  background: var(--mm-blue-100) !important;
+}
+
+/* PRODUCTS */
+.products-section {
+  background: transparent !important;
+}
+
+.product-card {
+  background: white !important;
+  border-color: var(--mm-border) !important;
+}
+
+.product-badge {
+  color: var(--mm-blue-600) !important;
+}
+
+.product-rating {
+  color: var(--mm-blue-500) !important;
+}
+
+.add-button {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* DEAL SECTION */
+.deal-section {
+  background:
+    radial-gradient(
+      circle at 80% 50%,
+      #2989df,
+      transparent 30%
+    ),
+    linear-gradient(
+      115deg,
+      #052c5d,
+      #075fb9
+    ) !important;
+  color: white !important;
+}
+
+.deal-label {
+  color: var(--mm-blue-200) !important;
+}
+
+.white-button {
+  background: white !important;
+  color: var(--mm-blue-700) !important;
+}
+
+/* HOW IT WORKS */
+.step-icon {
+  background: var(--mm-blue-100) !important;
+}
+
+/* SELLER SECTION */
+.seller-section {
+  background: var(--mm-blue-100) !important;
+}
+
+.seller-copy h2 {
+  color: var(--mm-blue-950) !important;
+}
+
+.seller-stats div {
+  background: white !important;
+  border-color: var(--mm-border) !important;
+}
+
+.seller-stats strong {
+  color: var(--mm-blue-600) !important;
+}
+
+.seller-white-button {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* STORIES */
+.story-blue {
+  background: var(--mm-blue-700) !important;
+  color: white !important;
+}
+
+.story-light {
+  background: var(--mm-blue-100) !important;
+  color: var(--mm-blue-900) !important;
+}
+
+/* VISION */
+.vision-section {
+  background: var(--mm-blue-950) !important;
+  color: white !important;
+}
+
+.vision-content > span {
+  color: var(--mm-blue-300) !important;
+}
+
+.vision-content h2 strong {
+  color: var(--mm-blue-300) !important;
+}
+
+.vision-content button {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* MAP */
+.map-ring {
+  border-color: rgba(102,183,243,.25) !important;
+}
+
+.map-point span {
+  background: var(--mm-blue-300) !important;
+}
+
+/* FOOTER */
+.mm-footer {
+  background: white !important;
+}
+
+.footer-column a:hover {
+  color: var(--mm-blue-600) !important;
+}
+
+/* CART */
+.mm-cart {
+  background: var(--mm-blue-100) !important;
+}
+
+.mm-cart b {
+  background: var(--mm-blue-600) !important;
+  color: white !important;
+}
+
+/* BUTTONS */
+button {
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+/* Make sure no old green branding survives */
+[class*="green"],
+[class*="emerald"] {
+  color: var(--mm-blue-600) !important;
+}
+
+/* Selection */
+::selection {
+  background: var(--mm-blue-200);
+  color: var(--mm-blue-950);
+}
