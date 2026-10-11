@@ -17,6 +17,287 @@ const sections = [
   ["Audit Logs & Security", "Security"],
 ];
 
+
+function ProductManagementPanel({ token }) {
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [approvedSellers, setApprovedSellers] = useState([]);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [formOpen, setFormOpen] = useState(false);
+  const blank = {
+    name: "", description: "", price: "", currency: "USD", categoryId: "", sellerId: "", stockQuantity: "0", imageUrl: ""
+  };
+  const [form, setForm] = useState(blank);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const params = new URLSearchParams({ limit: "100" });
+      if (search.trim()) params.set("search", search.trim());
+      if (status !== "all") params.set("status", status);
+      const result = await apiRequest(
+        `/management/products?${params.toString()}`, {}, token
+      );
+      setProducts(Array.isArray(result.products) ? result.products : []);
+      setCategories(Array.isArray(result.categories) ? result.categories : []);
+      setApprovedSellers(Array.isArray(result.sellers) ? result.sellers : []);
+    } catch (e) {
+      setError(e.message || "Unable to load products.");
+    } finally {
+      setLoading(false);
+    }
+  }, [token, search, status]);
+
+  useEffect(() => { load(); }, [load]);
+
+  function startCreate() {
+    setEditingId(null);
+    setForm(blank);
+    setFormOpen(true);
+    setError("");
+    setMessage("");
+  }
+
+  function startEdit(product) {
+    setEditingId(product.id);
+    setForm({
+      name: product.name || "",
+      description: product.description || "",
+      price: String(product.price ?? ""),
+      currency: product.currency || "USD",
+      categoryId: product.category_id || "",
+      stockQuantity: String(product.stock_quantity ?? 0),
+      imageUrl: product.image_url || ""
+    });
+    setFormOpen(true);
+    setError("");
+    setMessage("");
+  }
+
+  async function save(event) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const body = {
+        name: form.name.trim(),
+        description: form.description.trim() || null,
+        price: Number(form.price),
+        currency: form.currency.trim().toUpperCase(),
+        categoryId: form.categoryId || null,
+        stockQuantity: Number(form.stockQuantity),
+        imageUrl: form.imageUrl.trim() || null
+      };
+
+      if (!editingId) body.sellerId = form.sellerId;
+
+      const result = await apiRequest(
+        editingId
+          ? `/management/products/${encodeURIComponent(editingId)}`
+          : "/management/products",
+        { method: editingId ? "PATCH" : "POST", body },
+        token
+      );
+
+      setMessage(result.message || "Product saved.");
+      setFormOpen(false);
+      await load();
+    } catch (e) {
+      setError(e.message || "Unable to save product.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deactivate(product) {
+    if (!window.confirm(`Deactivate "${product.name}"? This hides it from active listings.`)) return;
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      const result = await apiRequest(
+        `/management/products/${encodeURIComponent(product.id)}`,
+        { method: "DELETE" },
+        token
+      );
+      setMessage(result.message || "Product deactivated.");
+      await load();
+    } catch (e) {
+      setError(e.message || "Unable to deactivate product.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleActive(product) {
+    setSaving(true);
+    setError("");
+    setMessage("");
+    try {
+      const result = await apiRequest(
+        `/management/products/${encodeURIComponent(product.id)}`,
+        { method: "PATCH", body: { isActive: !product.is_active } },
+        token
+      );
+      setMessage(result.message || "Product status updated.");
+      await load();
+    } catch (e) {
+      setError(e.message || "Unable to update product status.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="md-panel">
+      <div className="md-panel-heading">
+        <div>
+          <h2>Products &amp; Categories</h2>
+          <p>Live product records from the marketplace database.</p>
+        </div>
+        <button className="md-admin-submit" onClick={startCreate}>+ Add product</button>
+      </div>
+
+      {error && <div role="alert" className="md-error">{error}</div>}
+      {message && <div role="status" className="md-success">{message}</div>}
+
+      {formOpen && (
+        <form className="md-admin-form" onSubmit={save}>
+          <h3>{editingId ? "Edit product" : "Create product"}</h3>    
+    {!editingId && (
+      <label>
+        Approved seller
+        <select
+          value={form.sellerId}
+          onChange={(event) => setForm((current) => ({ ...current, sellerId: event.target.value }))}
+          required
+        >
+          <option value="">Select an approved seller</option>
+          {approvedSellers.map((seller) => (
+            <option key={seller.id} value={seller.id}>
+              {(seller.business_name || seller.full_name || seller.email) + " — " + seller.email}
+            </option>
+          ))}
+        </select>
+        {approvedSellers.length === 0 && (
+          <span>No approved sellers are available. Approve a seller before creating a product.</span>
+        )}
+      </label>
+    )}
+          <div className="md-admin-grid">
+            <label>Product name
+              <input required minLength={2} maxLength={180} value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })} />
+            </label>
+            <label>Price
+              <input required type="number" min="0" step="0.01" value={form.price}
+                onChange={e => setForm({ ...form, price: e.target.value })} />
+            </label>
+            <label>Currency
+              <select value={form.currency}
+                onChange={e => setForm({ ...form, currency: e.target.value })}>
+                <option value="USD">USD</option>
+                <option value="ZWG">ZWG</option>
+              </select>
+            </label>
+            <label>Category
+              <select value={form.categoryId}
+                onChange={e => setForm({ ...form, categoryId: e.target.value })}>
+                <option value="">Uncategorised</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </label>
+            <label>Stock quantity
+              <input required type="number" min="0" step="1" value={form.stockQuantity}
+                onChange={e => setForm({ ...form, stockQuantity: e.target.value })} />
+            </label>
+            <label>Image URL
+              <input type="url" maxLength={2000} value={form.imageUrl}
+                onChange={e => setForm({ ...form, imageUrl: e.target.value })}
+                placeholder="https://..." />
+            </label>
+          </div>
+          <label>Description
+            <textarea maxLength={5000} rows={3} value={form.description}
+              onChange={e => setForm({ ...form, description: e.target.value })} />
+          </label>
+          <div className="md-actions">
+            <button type="submit" disabled={saving}>
+              {saving ? "Saving…" : editingId ? "Save changes" : "Create product"}
+            </button>
+            <button type="button" disabled={saving} onClick={() => setFormOpen(false)}>Cancel</button>
+          </div>
+        </form>
+      )}
+
+      <div className="md-admin-grid" style={{ margin: "20px 0" }}>
+        <label>Search products
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search name or description…" />
+        </label>
+        <label>Status
+          <select value={status} onChange={e => setStatus(e.target.value)}>
+            <option value="all">All products</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </label>
+      </div>
+
+      <div className="md-panel-heading">
+        <h3>{products.length} product(s) loaded</h3>
+        <button disabled={loading || saving} onClick={load}>Refresh</button>
+      </div>
+
+      {loading && <div className="md-empty">Loading live products…</div>}
+      {!loading && products.length === 0 && !error &&
+        <div className="md-empty">No products match this search.</div>}
+
+      {products.length > 0 && (
+        <div className="md-table-wrap">
+          <table className="md-table">
+            <thead><tr>
+              <th>Product</th><th>Category</th><th>Seller</th>
+              <th>Price</th><th>Stock</th><th>Status</th><th>Actions</th>
+            </tr></thead>
+            <tbody>
+              {products.map(p => (
+                <tr key={p.id}>
+                  <td>
+                    <strong>{p.name}</strong>
+                    {p.image_url && <small><a href={p.image_url} target="_blank" rel="noreferrer">View image</a></small>}
+                    <small>{String(p.id).slice(0, 12)}</small>
+                  </td>
+                  <td>{p.category_name || "Uncategorised"}</td>
+                  <td>{p.seller_name || p.seller_email || "—"}</td>
+                  <td>{p.currency || "USD"} {Number(p.price).toFixed(2)}</td>
+                  <td>{p.stock_quantity}</td>
+                  <td><span className="md-badge">{p.is_active ? "ACTIVE" : "INACTIVE"}</span></td>
+                  <td className="md-actions">
+                    <button disabled={saving} onClick={() => startEdit(p)}>Edit</button>
+                    <button disabled={saving} onClick={() => toggleActive(p)}>
+                      {p.is_active ? "Deactivate" : "Activate"}
+                    </button>
+                    {p.is_active && <button disabled={saving} onClick={() => deactivate(p)}>Remove</button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
 export default function ManagementDashboard() {
   const [session, setSession] = useState(() => getSavedSession());
   const [section, setSection] = useState("Overview");
@@ -415,7 +696,8 @@ export default function ManagementDashboard() {
             }
           </div>}
 
-          {section !== "Overview" && section !== "Sellers" && section !== "Riders" &&
+          {section === "Products" && isManagement && <ProductManagementPanel token={token} />}
+          {section !== "Overview" && section !== "Sellers" && section !== "Riders" && section !== "Products" &&
             !(section === "Administrators" && isOwner) && <div className="md-panel md-coming"><span className="md-coming-icon">◇</span><h2>{section}</h2><p>This section is reserved for the next implementation stage. It must be connected to real, permission-protected backend endpoints before it can display or change live records.</p><span className="md-badge">BACKEND INTEGRATION REQUIRED</span>{["Administrators", "Security"].includes(section) && <p className="md-security-note">Security and audit-log views require dedicated backend integration before they can display complete live records.</p>}</div>}
         </div>
         <footer className="md-footer">Mbare Musika · Management access is logged and enforced by the backend where supported.</footer>
@@ -423,5 +705,7 @@ export default function ManagementDashboard() {
     </main>
   );
 }
+
+
 
 
