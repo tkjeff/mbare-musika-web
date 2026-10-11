@@ -24,3 +24,22 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Environment secrets
+.env
+.env.*
+!.env.example
+
+# Local backups
+backups/
+*.backup
+*.bak
+*.before-css-fix
+*.batch*-backup-*
+*.management-backup-*
+
+*.owner-backup-*
+
+
+*.owner-backup-*
+
