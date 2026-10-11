@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { apiRequest, getSavedSession, clearSession } from "./api.js";
 import "./ManagementDashboard.css";
 
@@ -303,6 +303,7 @@ export default function ManagementDashboard() {
   const [section, setSection] = useState("Overview");
   const [sellers, setSellers] = useState([]);
   const [riders, setRiders] = useState([]);
+  const [marketplaceStats, setMarketplaceStats] = useState(null);
   const [administrators, setAdministrators] = useState([]);
   const [adminForm, setAdminForm] = useState({
     fullName: "",
@@ -331,6 +332,7 @@ export default function ManagementDashboard() {
       const results = await Promise.allSettled([
         apiRequest("/admin/sellers/pending", {}, token),
         apiRequest("/admin/riders/pending", {}, token),
+        apiRequest("/admin/marketplace-stats", {}, token),
       ]);
       const extract = (result) => {
         if (result.status !== "fulfilled") return [];
@@ -340,6 +342,13 @@ export default function ManagementDashboard() {
       };
       setSellers(extract(results[0]));
       setRiders(extract(results[1]));
+
+      if (results[2].status === "fulfilled") {
+        setMarketplaceStats(results[2].value?.stats || null);
+      } else {
+        setMarketplaceStats(null);
+      }
+
       const failed = results.filter((item) => item.status === "rejected");
       if (failed.length) {
         setError(failed.map((item) => item.reason?.message || "Could not load applications").join(" "));
@@ -567,10 +576,14 @@ export default function ManagementDashboard() {
           {section === "Overview" && <>
             <div className="md-welcome"><div><span className="md-eyebrow">MARKETPLACE OPERATIONS</span><h2>Welcome to your control centre.</h2><p>Monitor applications and manage marketplace operations from one place.</p></div><button onClick={loadApplications} disabled={busy}>{busy ? "Refreshing…" : "↻ Refresh data"}</button></div>
             <div className="md-stats">
-              <article><span>Pending sellers</span><strong>{sellers.length}</strong><small>Returned by the live API</small></article>
-              <article><span>Pending riders</span><strong>{riders.length}</strong><small>Returned by the live API</small></article>
+              <article><span>Total customers</span><strong>{marketplaceStats ? marketplaceStats.totalCustomers.toLocaleString() : "—"}</strong><small>Registered customer accounts</small></article>
+              <article><span>Total sellers</span><strong>{marketplaceStats ? marketplaceStats.totalSellers.toLocaleString() : "—"}</strong><small>Registered seller accounts</small></article>
+              <article><span>Approved sellers</span><strong>{marketplaceStats ? marketplaceStats.approvedSellers.toLocaleString() : "—"}</strong><small>Approved seller profiles</small></article>
+              <article><span>Total riders</span><strong>{marketplaceStats ? marketplaceStats.totalRiders.toLocaleString() : "—"}</strong><small>Registered rider accounts</small></article>
+              <article><span>Approved riders</span><strong>{marketplaceStats ? marketplaceStats.approvedRiders.toLocaleString() : "—"}</strong><small>Approved rider profiles</small></article>
+              <article><span>Pending sellers</span><strong>{marketplaceStats ? marketplaceStats.pendingSellers.toLocaleString() : "—"}</strong><small>Applications awaiting review</small></article>
+              <article><span>Pending riders</span><strong>{marketplaceStats ? marketplaceStats.pendingRiders.toLocaleString() : "—"}</strong><small>Applications awaiting review</small></article>
               <article><span>Platform commission</span><strong>3%</strong><small>Configured business policy</small></article>
-              <article><span>Seller share</span><strong>97%</strong><small>Of eligible commissionable order value</small></article>
             </div>
             <div className="md-panel"><div className="md-panel-heading"><div><h3>Applications requiring review</h3><p>Review seller and rider applications before granting marketplace access.</p></div></div>
               <div className="md-shortcuts"><button onClick={() => setSection("Sellers")}>Review seller applications <span>→</span></button><button onClick={() => setSection("Riders")}>Review rider applications <span>→</span></button></div>
