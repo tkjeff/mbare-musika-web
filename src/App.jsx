@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { apiRequest, getSavedSession, saveSession, clearSession } from "./api.js";
 import "./App.css";
 import ManagementDashboard from "./ManagementDashboard.jsx";
@@ -1336,3 +1336,4 @@ function App() {
 
 export default App;
 
+// Mbare Musika seller dashboard deployment refresh
