@@ -32,4 +32,41 @@ export async function apiRequest(path, options = {}, token = null) {
   return payload;
 }
 
+export async function uploadManagementImage(file, token) {
+  if (!(file instanceof File)) {
+    throw new Error("Select an image file before uploading.");
+  }
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const response = await fetch(`${API_BASE_URL}/management/products/upload-image`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  const text = await response.text();
+  let payload = {};
+
+  try {
+    payload = text ? JSON.parse(text) : {};
+  } catch {
+    payload = { message: text || "Unexpected response from image service." };
+  }
+
+  if (!response.ok || payload.success === false) {
+    throw new Error(payload.message || `Image upload failed (${response.status}).`);
+  }
+
+  if (!payload.imageUrl || typeof payload.imageUrl !== "string") {
+    throw new Error("The image service did not return a valid image URL.");
+  }
+
+  return payload;
+}
+
 export { API_BASE_URL };

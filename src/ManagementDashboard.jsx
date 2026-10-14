@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { apiRequest, getSavedSession, clearSession } from "./api.js";
+import { apiRequest, uploadManagementImage, getSavedSession, clearSession } from "./api.js";
 import "./ManagementDashboard.css";
 
 const sections = [
@@ -26,6 +26,7 @@ function ProductManagementPanel({ token }) {
   const [status, setStatus] = useState("all");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [editingId, setEditingId] = useState(null);
@@ -115,6 +116,43 @@ function ProductManagementPanel({ token }) {
       setError(e.message || "Unable to save product.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleImageUpload(event) {
+    const input = event.currentTarget;
+    const file = input.files && input.files[0];
+
+    if (!file) return;
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+
+    if (!allowedTypes.includes(file.type)) {
+      setError("Choose a JPEG, PNG, WebP, or AVIF image.");
+      input.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("The image must be 5 MB or smaller.");
+      input.value = "";
+      return;
+    }
+
+    setUploadingImage(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const result = await uploadManagementImage(file, token);
+
+      setForm(current => ({ ...current, imageUrl: result.imageUrl }));
+      setMessage("Image uploaded successfully. Save the product to keep the image URL.");
+    } catch (e) {
+      setError(e.message || "Unable to upload the product image.");
+    } finally {
+      setUploadingImage(false);
+      input.value = "";
     }
   }
 
@@ -220,21 +258,49 @@ function ProductManagementPanel({ token }) {
               <input required type="number" min="0" step="1" value={form.stockQuantity}
                 onChange={e => setForm({ ...form, stockQuantity: e.target.value })} />
             </label>
+            <label className="md-image-upload-label">Product image
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/avif"
+                onChange={handleImageUpload}
+                disabled={uploadingImage || saving}
+              />
+              <small>JPEG, PNG, WebP or AVIF. Maximum size: 5 MB.</small>
+              {uploadingImage && <span role="status">Uploading image securely…</span>}
+            </label>
             <label>Image URL
               <input type="url" maxLength={2000} value={form.imageUrl}
-                onChange={e => setForm({ ...form, imageUrl: e.target.value })}
-                placeholder="https://..." />
+                onChange={e => setForm(current => ({ ...current, imageUrl: e.target.value }))}
+                placeholder="Upload an image or paste an https:// image URL" />
             </label>
+            {form.imageUrl && (
+              <div className="md-image-preview">
+                <span>Image preview</span>
+                <img
+                  src={form.imageUrl}
+                  alt="Product preview"
+                  onError={event => { event.currentTarget.style.display = "none"; }}
+                  onLoad={event => { event.currentTarget.style.display = "block"; }}
+                />
+                <button
+                  type="button"
+                  disabled={saving || uploadingImage}
+                  onClick={() => setForm(current => ({ ...current, imageUrl: "" }))}
+                >
+                  Remove image
+                </button>
+              </div>
+            )}
           </div>
           <label>Description
             <textarea maxLength={5000} rows={3} value={form.description}
               onChange={e => setForm({ ...form, description: e.target.value })} />
           </label>
           <div className="md-actions">
-            <button type="submit" disabled={saving}>
+            <button type="submit" disabled={saving || uploadingImage}>
               {saving ? "Saving…" : editingId ? "Save changes" : "Create product"}
             </button>
-            <button type="button" disabled={saving} onClick={() => setFormOpen(false)}>Cancel</button>
+            <button type="button" disabled={saving || uploadingImage} onClick={() => setFormOpen(false)}>Cancel</button>
           </div>
         </form>
       )}

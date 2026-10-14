@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --md-navy: #071b3b;
   --md-blue: #155eef;
   --md-bright: #287bff;
@@ -63,3 +63,57 @@
 .md-admin-submit:disabled{opacity:.6;cursor:wait}
 .md-admin-list-heading{margin-top:25px}
 @media(max-width:600px){.md-admin-form-grid{grid-template-columns:1fr}.md-admin-form{padding:14px}}
+
+
+.md-image-upload-label input[type="file"] {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px dashed #9bbce8;
+  border-radius: 9px;
+  padding: 12px;
+  background: #fff;
+  color: var(--md-text);
+  font: inherit;
+}
+.md-image-upload-label small {
+  color: var(--md-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.md-image-preview {
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--md-line);
+  border-radius: 10px;
+  background: #fff;
+  min-width: 0;
+}
+.md-image-preview > span {
+  color: var(--md-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+.md-image-preview img {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f4f8ff;
+}
+.md-image-preview button {
+  border: 1px solid #cbdcf4;
+  border-radius: 7px;
+  background: #eaf3ff;
+  color: #174a91;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+.md-image-preview button:disabled {
+  opacity: .5;
+  cursor: wait;
+}

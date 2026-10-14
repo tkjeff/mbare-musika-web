@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { apiRequest, getSavedSession, saveSession, clearSession } from "./api.js";
 import "./App.css";
 import ManagementDashboard from "./ManagementDashboard.jsx";
 import AccountPortal from "./AccountPortal.jsx";
+import SellerDashboard from "./SellerDashboard.jsx";
 
 const products = [
   {
@@ -256,7 +257,7 @@ function App() {
     if (!cart.length || cart.some((item) => !item.isLive || typeof item.id !== "string")) { setFormBusy(false); setFormError("The cart contains demo products. Refresh the page after the backend has real approved product listings, then add those products to your cart."); return; }
     const data = new FormData(event.currentTarget);
     try {
-      const result = await apiRequest("/orders", { method: "POST", body: { items: cart.map((item) => ({ productId: item.id, quantity: item.quantity })), deliveryAddress: `${String(data.get("deliveryArea") || "").trim()} — ${String(data.get("deliveryAddress") || "").trim()}` } }, session.token);
+      const result = await apiRequest("/orders", { method: "POST", body: { items: cart.map((item) => ({ productId: item.id, quantity: item.quantity })), deliveryAddress: `${String(data.get("deliveryArea") || "").trim()} â€” ${String(data.get("deliveryAddress") || "").trim()}` } }, session.token);
       setCart([]); setFormSuccess(`Order placed successfully${result.order?.id || result.id ? ` (reference: ${result.order?.id || result.id})` : ""}.`); setNotification("Your order has been submitted");
     } catch (error) { setFormError(error.message || "Could not place order."); }
     finally { setFormBusy(false); }
@@ -285,12 +286,12 @@ function App() {
 
   return (
     <>
-      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : ["/account", "/login", "/seller", "/rider"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
+      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/seller" ? <SellerDashboard /> : ["/account", "/login", "/rider"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
       <div className="app">
 
       {notification && (
         <div className="notification">
-          <span>✓</span>
+          <span>âœ“</span>
           {notification}
         </div>
       )}
@@ -304,13 +305,13 @@ function App() {
         <div className="news-track">
           <div className="news-content">
             <span>Fresh produce now available from Mbare sellers</span>
-            <span>•</span>
+            <span>â€¢</span>
             <span>Local delivery options depend on your area</span>
-            <span>•</span>
+            <span>â€¢</span>
             <span>New sellers joining Mbare Musika every week</span>
-            <span>•</span>
+            <span>â€¢</span>
             <span>Shop local. Support Zimbabwean businesses.</span>
-            <span>•</span>
+            <span>â€¢</span>
             <span>Fresh produce now available from Mbare sellers</span>
           </div>
         </div>
@@ -340,7 +341,7 @@ function App() {
           </div>
 
           <div className="search-box">
-            <span className="search-icon">âŒ•</span>
+            <span className="search-icon">Ã¢Å’â€¢</span>
 
             <input
               value={search}
@@ -363,7 +364,7 @@ function App() {
                 )
               }
             >
-              <span className="action-icon">♡</span>
+              <span className="action-icon">â™¡</span>
               <span>
                 Wishlist
                 {wishlist.length > 0 && (
@@ -376,7 +377,7 @@ function App() {
               className="header-action"
               onClick={() => { window.location.href = "/account"; }}
             >
-              <span className="action-icon">♙</span>
+              <span className="action-icon">â™™</span>
               <span>Account</span>
             </button>
 
@@ -384,7 +385,7 @@ function App() {
               className="cart-button"
               onClick={() => openModal("cart")}
             >
-              <span className="cart-icon">ðŸ›’</span>
+              <span className="cart-icon">Ã°Å¸â€ºâ€™</span>
               <span>Cart</span>
 
               {cartCount > 0 && (
@@ -498,7 +499,7 @@ function App() {
                   onClick={() => scrollToSection("products")}
                 >
                   {promotions[activePromotion].button}
-                  <span>→</span>
+                  <span>â†’</span>
                 </button>
 
                 <button
@@ -571,7 +572,7 @@ function App() {
               className="text-button"
               onClick={() => scrollToSection("products")}
             >
-              View all categories →
+              View all categories â†’
             </button>
 
           </div>
@@ -599,7 +600,7 @@ function App() {
 
                 <div className="category-name">
                   {category.name}
-                  <span>→</span>
+                  <span>â†’</span>
                 </div>
 
               </button>
@@ -638,7 +639,7 @@ function App() {
                 scrollToSection("products");
               }}
             >
-              See all products →
+              See all products â†’
             </button>
 
           </div>
@@ -667,8 +668,8 @@ function App() {
                     onClick={() => toggleWishlist(product)}
                   >
                     {wishlist.includes(product.id)
-                      ? "♥"
-                      : "♡"}
+                      ? "â™¥"
+                      : "â™¡"}
                   </button>
 
                   <span className="product-badge">
@@ -692,7 +693,7 @@ function App() {
                   </p>
 
                   <div className="rating">
-                    <span>â˜…â˜…â˜…â˜…â˜…</span>
+                    <span>Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦</span>
                     <small>4.8</small>
                   </div>
 
@@ -771,7 +772,7 @@ function App() {
                 className="white-button"
                 onClick={() => scrollToSection("products")}
               >
-                Shop Today's Deals →
+                Shop Today's Deals â†’
               </button>
 
             </div>
@@ -798,7 +799,7 @@ function App() {
         <section className="benefits">
 
           <div className="benefit">
-            <div className="benefit-icon">ðŸšš</div>
+            <div className="benefit-icon">Ã°Å¸Å¡Å¡</div>
 
             <div>
               <h3>Local Delivery</h3>
@@ -809,7 +810,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">✓</div>
+            <div className="benefit-icon">âœ“</div>
 
             <div>
               <h3>Trusted Sellers</h3>
@@ -820,7 +821,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">â—†</div>
+            <div className="benefit-icon">Ã¢â€”â€ </div>
 
             <div>
               <h3>Shop Local</h3>
@@ -831,7 +832,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">↗</div>
+            <div className="benefit-icon">â†—</div>
 
             <div>
               <h3>Growing Marketplace</h3>
@@ -866,7 +867,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">01</div>
-              <div className="step-icon">âŒ•</div>
+              <div className="step-icon">Ã¢Å’â€¢</div>
               <h3>Discover</h3>
               <p>
                 Search products and discover trusted sellers from Mbare.
@@ -875,7 +876,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">02</div>
-              <div className="step-icon">ðŸ›’</div>
+              <div className="step-icon">Ã°Å¸â€ºâ€™</div>
               <h3>Order</h3>
               <p>
                 Choose what you need and place your order online.
@@ -884,7 +885,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">03</div>
-              <div className="step-icon">✓</div>
+              <div className="step-icon">âœ“</div>
               <h3>Seller Prepares</h3>
               <p>
                 Your local seller receives and prepares your order.
@@ -893,7 +894,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">04</div>
-              <div className="step-icon">ðŸšš</div>
+              <div className="step-icon">Ã°Å¸Å¡Å¡</div>
               <h3>Delivered</h3>
               <p>
                 A local rider brings your purchase directly to you.
@@ -915,7 +916,7 @@ function App() {
             <div className="seller-copy">
 
               <span className="eyebrow light">
-                FOR MBARÉ BUSINESSES
+                FOR MBARÃ‰ BUSINESSES
               </span>
 
               <h2>
@@ -941,7 +942,7 @@ function App() {
                 </div>
 
                 <div>
-                  <strong>âˆž</strong>
+                  <strong>Ã¢Ë†Å¾</strong>
                   <span>Growth potential</span>
                 </div>
 
@@ -954,7 +955,7 @@ function App() {
                 }
               >
                 Start Selling
-                <span>→</span>
+                <span>â†’</span>
               </button>
 
             </div>
@@ -1167,7 +1168,7 @@ function App() {
                   openModal("about")
                 }
               >
-                Explore Our Vision →
+                Explore Our Vision â†’
               </button>
 
             </div>
@@ -1272,11 +1273,11 @@ function App() {
 
         <div className="footer-bottom">
           <span>
-            Â© 2026 Mbare Musika. Built in Zimbabwe.
+            Ã‚Â© 2026 Mbare Musika. Built in Zimbabwe.
           </span>
 
           <span>
-            Connecting sellers • customers • riders
+            Connecting sellers â€¢ customers â€¢ riders
           </span>
         </div>
 
@@ -1285,16 +1286,16 @@ function App() {
       {modal && (
         <div className="mm-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setModal(""); }}>
           <section className="mm-modal" role="dialog" aria-modal="true" aria-labelledby="mm-modal-title">
-            <button className="mm-modal-close" aria-label="Close" onClick={() => setModal("")}>×</button>
+            <button className="mm-modal-close" aria-label="Close" onClick={() => setModal("")}>Ã—</button>
             {modal === "cart" && <>
               <span className="eyebrow">YOUR BASKET</span><h2 id="mm-modal-title">Shopping cart</h2>
               {cart.length === 0 ? <p>Your cart is empty. Browse the marketplace and add products to begin.</p> : <>
                 <div className="mm-cart-list">{cart.map((item) => <div className="mm-cart-row" key={item.id}>
                   <img src={item.image} alt=""/><div className="mm-cart-info"><strong>{item.name}</strong><small>{item.currency || "USD"} {item.price.toFixed(2)} each</small>
-                  <div className="mm-quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity">âˆ’</button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity">+</button><button className="mm-remove" onClick={() => removeCartItem(item.id)}>Remove</button></div></div>
+                  <div className="mm-quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity">Ã¢Ë†â€™</button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity">+</button><button className="mm-remove" onClick={() => removeCartItem(item.id)}>Remove</button></div></div>
                   <strong>{item.currency || "USD"} {(item.price * item.quantity).toFixed(2)}</strong></div>)}</div>
                 <div className="mm-cart-total"><span>Subtotal</span><strong>{cart[0]?.currency || "USD"} {cartTotal.toFixed(2)}</strong></div>
-                <button className="primary-button mm-full-button" onClick={() => { if (!session?.token) { setModal("login"); setFormError("Please sign in before checkout."); } else { setModal("checkout"); setFormError(""); } }}>Continue to checkout →</button>
+                <button className="primary-button mm-full-button" onClick={() => { if (!session?.token) { setModal("login"); setFormError("Please sign in before checkout."); } else { setModal("checkout"); setFormError(""); } }}>Continue to checkout â†’</button>
               </>}
             </>}
             {(modal === "login" || modal === "account" || modal === "register" || modal === "seller" || modal === "rider") && <>
@@ -1302,18 +1303,18 @@ function App() {
               {session?.token && (modal === "login" || modal === "account") ? <div><p>You are signed in{session.user?.full_name ? ` as ${session.user.full_name}` : ""}.</p><button className="primary-button" onClick={loadOrders}>View my orders</button><button className="secondary-button" onClick={() => { clearSession(); setSession(null); setNotification("You have signed out"); setModal(""); }}>Sign out</button></div> : <form className="mm-form" onSubmit={submitAccount}>
                 {modal !== "login" && <label>Full name<input name="fullName" autoComplete="name" required minLength="2" /></label>}
                 <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
-                {modal !== "login" && <label>Phone number<input name="phone" type="tel" autoComplete="tel" placeholder="e.g. +263…" /></label>}
+                {modal !== "login" && <label>Phone number<input name="phone" type="tel" autoComplete="tel" placeholder="e.g. +263â€¦" /></label>}
                 <label>Password<input name="password" type="password" autoComplete={(modal === "login" || modal === "account") ? "current-password" : "new-password"} minLength="8" required /></label>
                 {modal === "seller" && <><label>Business name<input name="businessName" required /></label><label>Business address<input name="businessAddress" required /></label></>}
                 {modal === "rider" && <><label>Vehicle type<select name="vehicleType" required><option value="">Choose vehicle</option><option value="BICYCLE">Bicycle</option><option value="MOTORCYCLE">Motorcycle</option><option value="CAR">Car</option><option value="VAN">Van</option></select></label><label>Service area<input name="serviceArea" required placeholder="e.g. Mbare" /></label></>}
-                <button className="primary-button mm-full-button" disabled={formBusy}>{formBusy ? "Please wait…" : modal === "login" ? "Sign in" : "Create account"}</button>
+                <button className="primary-button mm-full-button" disabled={formBusy}>{formBusy ? "Please waitâ€¦" : modal === "login" ? "Sign in" : "Create account"}</button>
                 {(modal === "login" || modal === "account") && <p className="mm-switch">New here? <button type="button" onClick={() => { setModal("register"); setFormError(""); }}>Create an account</button></p>}
                 {modal === "register" && <p className="mm-switch">Already registered? <button type="button" onClick={() => { setModal("login"); setFormError(""); }}>Sign in</button></p>}
               </form>}
             </>}
             {modal === "product" && selectedProduct && <><span className="eyebrow">PRODUCT DETAILS</span><h2 id="mm-modal-title">{selectedProduct.name}</h2><img className="mm-product-detail-image" src={selectedProduct.image} alt={selectedProduct.name} /><p>Sold by <strong>{selectedProduct.seller}</strong></p><p>Category: {selectedProduct.category}</p><p className="mm-product-detail-price">{selectedProduct.currency || "USD"} {selectedProduct.price.toFixed(2)}</p>{selectedProduct.isLive ? <button className="primary-button mm-full-button" onClick={() => { addToCart(selectedProduct); setModal("cart"); }}>Add to cart</button> : <p className="mm-muted">This is a preview listing. Live checkout requires an approved product from the marketplace API.</p>}</>}
-            {modal === "orders" && <><span className="eyebrow">CUSTOMER ACCOUNT</span><h2 id="mm-modal-title">My orders</h2>{ordersBusy ? <p>Loading your orders…</p> : orders.length === 0 ? <p>No orders were returned for this account yet.</p> : <div className="mm-orders-list">{orders.map((order, index) => <article className="mm-order-card" key={order.id || index}><div><strong>Order {String(order.id || index + 1).slice(0, 12)}</strong><span>{order.status || "Status unavailable"}</span></div><p>{order.currency || "USD"} {Number(order.total || 0).toFixed(2)}</p><small>{order.created_at ? new Date(order.created_at).toLocaleString() : "Date not provided"}</small></article>)}</div>}<button className="secondary-button mm-full-button" onClick={() => setModal("account")}>Back to account</button></>}
-            {modal === "checkout" && <><span className="eyebrow">DELIVERY DETAILS</span><h2 id="mm-modal-title">Checkout</h2><p>Confirm where your order should be delivered. Your order will be sent to the marketplace API.</p><form className="mm-form" onSubmit={submitOrder}><label>Delivery area<input name="deliveryArea" placeholder="e.g. Mbare, Harare" required /></label><label>Full delivery address<textarea name="deliveryAddress" minLength="5" maxLength="1000" required placeholder="Street, stand/house number, and delivery instructions" /></label><label>Contact phone<input name="phone" type="tel" required placeholder="+263…" /></label><div className="mm-cart-total"><span>Order subtotal</span><strong>{cart[0]?.currency || "USD"} {cartTotal.toFixed(2)}</strong></div><p className="mm-muted">Delivery fee and payment options will be confirmed by the marketplace. This checkout does not collect card details.</p><button className="primary-button mm-full-button" disabled={formBusy}>{formBusy ? "Submitting order…" : "Place order"}</button></form></>}
+            {modal === "orders" && <><span className="eyebrow">CUSTOMER ACCOUNT</span><h2 id="mm-modal-title">My orders</h2>{ordersBusy ? <p>Loading your ordersâ€¦</p> : orders.length === 0 ? <p>No orders were returned for this account yet.</p> : <div className="mm-orders-list">{orders.map((order, index) => <article className="mm-order-card" key={order.id || index}><div><strong>Order {String(order.id || index + 1).slice(0, 12)}</strong><span>{order.status || "Status unavailable"}</span></div><p>{order.currency || "USD"} {Number(order.total || 0).toFixed(2)}</p><small>{order.created_at ? new Date(order.created_at).toLocaleString() : "Date not provided"}</small></article>)}</div>}<button className="secondary-button mm-full-button" onClick={() => setModal("account")}>Back to account</button></>}
+            {modal === "checkout" && <><span className="eyebrow">DELIVERY DETAILS</span><h2 id="mm-modal-title">Checkout</h2><p>Confirm where your order should be delivered. Your order will be sent to the marketplace API.</p><form className="mm-form" onSubmit={submitOrder}><label>Delivery area<input name="deliveryArea" placeholder="e.g. Mbare, Harare" required /></label><label>Full delivery address<textarea name="deliveryAddress" minLength="5" maxLength="1000" required placeholder="Street, stand/house number, and delivery instructions" /></label><label>Contact phone<input name="phone" type="tel" required placeholder="+263â€¦" /></label><div className="mm-cart-total"><span>Order subtotal</span><strong>{cart[0]?.currency || "USD"} {cartTotal.toFixed(2)}</strong></div><p className="mm-muted">Delivery fee and payment options will be confirmed by the marketplace. This checkout does not collect card details.</p><button className="primary-button mm-full-button" disabled={formBusy}>{formBusy ? "Submitting orderâ€¦" : "Place order"}</button></form></>}
             {["help", "delivery", "contact", "about"].includes(modal) && <><span className="eyebrow">MBARE MUSIKA</span><h2 id="mm-modal-title">{({help:"Help centre",delivery:"Delivery information",contact:"Contact Mbare Musika",about:"About our marketplace"})[modal]}</h2><p>{({help:"For account, product, or order support, contact the marketplace team. Include your order reference if you have one.",delivery:"Delivery availability and fees depend on the delivery area and seller. Enter your full address at checkout. Orders from different customers remain separate.",contact:"Contact Mbare Musika for customer support, seller onboarding, delivery enquiries, and orders.",about:"Mbare Musika connects Zimbabwean customers with local market sellers. This marketplace is being prepared for a production launch."})[modal]}</p>{modal === "contact" && <div className="mm-contact-details">
               <p><strong>Phone:</strong> <a href="tel:+263780373838">+263 784 307 443</a></p>
               <p><strong>WhatsApp:</strong> <a href="https://wa.me/263719407443" target="_blank" rel="noreferrer">+263 719 407 443 - Chat with us</a></p>
@@ -1334,3 +1335,4 @@ function App() {
 }
 
 export default App;
+
