@@ -1,0 +1,314 @@
+﻿import { useEffect, useState } from "react";
+import { apiRequest, getSavedSession, saveSession, clearSession } from "./api.js";
+import "./AccountPortal.css";
+
+function destinationForRole(roleValue) {
+  const role = String(roleValue || "").toUpperCase();
+
+  if (role === "OWNER" || role === "ADMIN") return "/management";
+  if (role === "SELLER") return "/seller";
+  if (role === "RIDER") return "/rider";
+
+  return "/account";
+}
+
+function readableRole(roleValue) {
+  const role = String(roleValue || "CUSTOMER").toUpperCase();
+
+  if (role === "OWNER") return "Platform Owner";
+  if (role === "ADMIN") return "Administrator";
+  if (role === "SELLER") return "Seller";
+  if (role === "RIDER") return "Delivery Rider";
+
+  return "Customer";
+}
+
+export default function AccountPortal() {
+  const [session, setSession] = useState(() => getSavedSession());
+  const [mode, setMode] = useState("login");
+  const [role, setRole] = useState("CUSTOMER");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    if (session?.token && session?.user) {
+      const target = destinationForRole(session.user.role);
+      const current = window.location.pathname.replace(/\/+$/, "") || "/";
+
+      if (target !== current) {
+        window.location.replace(target);
+      }
+    }
+  }, [session]);
+
+  async function submit(event) {
+    event.preventDefault();
+    if (busy) return;
+
+    setBusy(true);
+    setError("");
+    setNotice("");
+
+    const form = new FormData(event.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+
+    try {
+      if (mode === "register") {
+        payload.role = role;
+      }
+
+      const result = await apiRequest(
+        mode === "login" ? "/auth/login" : "/auth/register",
+        { method: "POST", body: payload }
+      );
+
+      const token =
+        result.token ||
+        result.accessToken ||
+        result.data?.token ||
+        result.data?.accessToken;
+
+      const user =
+        result.user ||
+        result.data?.user ||
+        result.customer ||
+        null;
+
+      if (token) {
+        const newSession = { token, user };
+        saveSession(newSession);
+        setSession(newSession);
+        window.location.assign(destinationForRole(user?.role));
+        return;
+      }
+
+      if (mode === "register") {
+        setMode("login");
+        setNotice("Your registration request was processed. Sign in to continue if your account was created successfully.");
+      } else {
+        setError("The API did not return an authentication token. Please check your credentials and try again.");
+      }
+    } catch (requestError) {
+      setError(requestError?.message || "Unable to connect to Mbare Musika. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function signOut() {
+    clearSession();
+    setSession(null);
+    setError("");
+    setNotice("You have signed out.");
+    window.location.replace("/account");
+  }
+
+  const currentRole = String(session?.user?.role || "CUSTOMER").toUpperCase();
+  const userName =
+    session?.user?.full_name ||
+    session?.user?.fullName ||
+    session?.user?.name ||
+    session?.user?.email ||
+    "Marketplace user";
+
+  if (session?.token && session?.user) {
+    return (
+      <main className="mm-portal">
+        <header className="mm-portal-header">
+          <a href="/" className="mm-portal-brand">
+            <span className="mm-portal-logo">MM</span>
+            <span>MBARE MUSIKA<small>YOUR MARKET. ONLINE.</small></span>
+          </a>
+          <a className="mm-portal-home" href="/">Visit marketplace ↗</a>
+        </header>
+
+        <section className="mm-portal-dashboard">
+          <div className="mm-portal-eyebrow">YOUR ACCOUNT</div>
+          <h1>Welcome back, {userName}</h1>
+          <p className="mm-portal-intro">
+            Your Mbare Musika account is signed in. Use the options below to continue.
+          </p>
+
+          <div className="mm-portal-role-card">
+            <span className="mm-portal-role-icon">MM</span>
+            <div>
+              <span className="mm-portal-muted">ACCOUNT TYPE</span>
+              <h2>{readableRole(currentRole)}</h2>
+              <p>{session.user?.email || "Signed-in account"}</p>
+            </div>
+            <span className="mm-portal-status">SIGNED IN</span>
+          </div>
+
+          <div className="mm-portal-actions">
+            {currentRole === "OWNER" || currentRole === "ADMIN" ? (
+              <a className="mm-portal-primary" href="/management">Open management centre →</a>
+            ) : currentRole === "SELLER" ? (
+              <a className="mm-portal-primary" href="/">Continue to marketplace →</a>
+            ) : currentRole === "RIDER" ? (
+              <a className="mm-portal-primary" href="/">Open rider marketplace access →</a>
+            ) : (
+              <>
+                <a className="mm-portal-primary" href="/">Continue shopping →</a>
+                <button
+                  className="mm-portal-secondary"
+                  type="button"
+                  onClick={() => { window.location.href = "/"; }}
+                >
+                  Return to storefront
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="mm-portal-note">
+            <strong>Account security</strong>
+            <p>Never share your password or sign-in token. Sign out when using a shared device.</p>
+          </div>
+
+          <button className="mm-portal-signout" type="button" onClick={signOut}>
+            Sign out
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mm-portal">
+      <header className="mm-portal-header">
+        <a href="/" className="mm-portal-brand">
+          <span className="mm-portal-logo">MM</span>
+          <span>MBARE MUSIKA<small>YOUR MARKET. ONLINE.</small></span>
+        </a>
+        <a className="mm-portal-home" href="/">Back to marketplace ↗</a>
+      </header>
+
+      <section className="mm-portal-layout">
+        <div className="mm-portal-promo">
+          <div className="mm-portal-eyebrow">THE MARKETPLACE, CONNECTED</div>
+          <h1>Your Mbare market.<br />One account.</h1>
+          <p>
+            Shop local products, connect with sellers, and access your marketplace
+            account through one secure sign-in portal.
+          </p>
+          <div className="mm-portal-feature"><span>01</span><div><strong>Shop with confidence</strong><small>Discover products across marketplace categories.</small></div></div>
+          <div className="mm-portal-feature"><span>02</span><div><strong>Grow your business</strong><small>Access the marketplace as a seller.</small></div></div>
+          <div className="mm-portal-feature"><span>03</span><div><strong>Connect deliveries</strong><small>Register your interest as a delivery rider.</small></div></div>
+        </div>
+
+        <div className="mm-portal-form-panel">
+          <div className="mm-portal-eyebrow">{mode === "login" ? "SECURE SIGN IN" : "JOIN THE MARKETPLACE"}</div>
+          <h2>{mode === "login" ? "Welcome back" : "Create your account"}</h2>
+          <p className="mm-portal-form-intro">
+            {mode === "login"
+              ? "Sign in with the email address and password registered to your account."
+              : "Enter your details to create a marketplace account."}
+          </p>
+
+          {error && <div className="mm-portal-alert" role="alert">{error}</div>}
+          {notice && <div className="mm-portal-notice" role="status">{notice}</div>}
+
+          <form className="mm-portal-form" onSubmit={submit}>
+            {mode === "register" && (
+              <>
+                <label>
+                  Full name
+                  <input name="fullName" autoComplete="name" required minLength={2} />
+                </label>
+
+                <label>
+                  Phone number
+                  <input name="phone" type="tel" autoComplete="tel" required />
+                </label>
+
+                <label>
+                  Account type
+                  <select value={role} onChange={(event) => setRole(event.target.value)}>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="SELLER">Seller</option>
+                    <option value="RIDER">Delivery rider</option>
+                  </select>
+                </label>
+
+                {role === "SELLER" && (
+                  <>
+                    <label>
+                      Business name
+                      <input name="businessName" required />
+                    </label>
+                    <label>
+                      Business address
+                      <input name="businessAddress" required />
+                    </label>
+                  </>
+                )}
+
+                {role === "RIDER" && (
+                  <>
+                    <label>
+                      Vehicle type
+                      <input name="vehicleType" placeholder="e.g. bicycle or motorbike" required />
+                    </label>
+                    <label>
+                      Service area
+                      <input name="serviceArea" placeholder="e.g. Mbare and nearby suburbs" required />
+                    </label>
+                  </>
+                )}
+              </>
+            )}
+
+            <label>
+              Email address
+              <input
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+              />
+            </label>
+
+            <label>
+              Password
+              <input
+                name="password"
+                type="password"
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+                minLength={8}
+                required
+              />
+            </label>
+
+            <button className="mm-portal-primary mm-portal-submit" disabled={busy} type="submit">
+              {busy
+                ? "Please wait..."
+                : mode === "login"
+                  ? "Sign in securely →"
+                  : "Create account →"}
+            </button>
+          </form>
+
+          <p className="mm-portal-switch">
+            {mode === "login" ? "New to Mbare Musika?" : "Already have an account?"}
+            {" "}
+            <button
+              type="button"
+              onClick={() => {
+                setMode(mode === "login" ? "register" : "login");
+                setError("");
+                setNotice("");
+              }}
+            >
+              {mode === "login" ? "Create an account" : "Sign in"}
+            </button>
+          </p>
+
+          <p className="mm-portal-smallprint">
+            Administrator and owner privileges are assigned by the platform, not by public registration.
+          </p>
+        </div>
+      </section>
+    </main>
+  );
+}

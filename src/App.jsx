@@ -257,7 +257,7 @@ function App() {
     if (!cart.length || cart.some((item) => !item.isLive || typeof item.id !== "string")) { setFormBusy(false); setFormError("The cart contains demo products. Refresh the page after the backend has real approved product listings, then add those products to your cart."); return; }
     const data = new FormData(event.currentTarget);
     try {
-      const result = await apiRequest("/orders", { method: "POST", body: { items: cart.map((item) => ({ productId: item.id, quantity: item.quantity })), deliveryAddress: `${String(data.get("deliveryArea") || "").trim()} â€” ${String(data.get("deliveryAddress") || "").trim()}` } }, session.token);
+      const result = await apiRequest("/orders", { method: "POST", body: { items: cart.map((item) => ({ productId: item.id, quantity: item.quantity })), deliveryAddress: `${String(data.get("deliveryArea") || "").trim()} — ${String(data.get("deliveryAddress") || "").trim()}` } }, session.token);
       setCart([]); setFormSuccess(`Order placed successfully${result.order?.id || result.id ? ` (reference: ${result.order?.id || result.id})` : ""}.`); setNotification("Your order has been submitted");
     } catch (error) { setFormError(error.message || "Could not place order."); }
     finally { setFormBusy(false); }
@@ -291,7 +291,7 @@ function App() {
 
       {notification && (
         <div className="notification">
-          <span>âœ“</span>
+          <span>✓</span>
           {notification}
         </div>
       )}
@@ -341,7 +341,7 @@ function App() {
           </div>
 
           <div className="search-box">
-            <span className="search-icon">Ã¢Å’â€¢</span>
+            <span className="search-icon">🔍</span>
 
             <input
               value={search}
@@ -364,7 +364,7 @@ function App() {
                 )
               }
             >
-              <span className="action-icon">â™¡</span>
+              <span className="action-icon">♡</span>
               <span>
                 Wishlist
                 {wishlist.length > 0 && (
@@ -385,7 +385,7 @@ function App() {
               className="cart-button"
               onClick={() => openModal("cart")}
             >
-              <span className="cart-icon">Ã°Å¸â€ºâ€™</span>
+              <span className="cart-icon">🛒</span>
               <span>Cart</span>
 
               {cartCount > 0 && (
@@ -499,7 +499,7 @@ function App() {
                   onClick={() => scrollToSection("products")}
                 >
                   {promotions[activePromotion].button}
-                  <span>â†’</span>
+                  <span>→</span>
                 </button>
 
                 <button
@@ -572,7 +572,7 @@ function App() {
               className="text-button"
               onClick={() => scrollToSection("products")}
             >
-              View all categories â†’
+              View all categories →
             </button>
 
           </div>
@@ -600,7 +600,7 @@ function App() {
 
                 <div className="category-name">
                   {category.name}
-                  <span>â†’</span>
+                  <span>→</span>
                 </div>
 
               </button>
@@ -639,7 +639,7 @@ function App() {
                 scrollToSection("products");
               }}
             >
-              See all products â†’
+              See all products →
             </button>
 
           </div>
@@ -669,7 +669,7 @@ function App() {
                   >
                     {wishlist.includes(product.id)
                       ? "â™¥"
-                      : "â™¡"}
+                      : "♡"}
                   </button>
 
                   <span className="product-badge">
@@ -693,7 +693,7 @@ function App() {
                   </p>
 
                   <div className="rating">
-                    <span>Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦Ã¢Ëœâ€¦</span>
+                    <span>★★★★★</span>
                     <small>4.8</small>
                   </div>
 
@@ -772,7 +772,7 @@ function App() {
                 className="white-button"
                 onClick={() => scrollToSection("products")}
               >
-                Shop Today's Deals â†’
+                Shop Today's Deals →
               </button>
 
             </div>
@@ -799,7 +799,7 @@ function App() {
         <section className="benefits">
 
           <div className="benefit">
-            <div className="benefit-icon">Ã°Å¸Å¡Å¡</div>
+            <div className="benefit-icon">&#128666;</div>
 
             <div>
               <h3>Local Delivery</h3>
@@ -810,7 +810,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">âœ“</div>
+            <div className="benefit-icon">✓</div>
 
             <div>
               <h3>Trusted Sellers</h3>
@@ -821,7 +821,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">Ã¢â€”â€ </div>
+            <div className="benefit-icon">&#9670; </div>
 
             <div>
               <h3>Shop Local</h3>
@@ -832,7 +832,7 @@ function App() {
           </div>
 
           <div className="benefit">
-            <div className="benefit-icon">â†—</div>
+            <div className="benefit-icon">↗</div>
 
             <div>
               <h3>Growing Marketplace</h3>
@@ -867,7 +867,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">01</div>
-              <div className="step-icon">Ã¢Å’â€¢</div>
+              <div className="step-icon">🔍</div>
               <h3>Discover</h3>
               <p>
                 Search products and discover trusted sellers from Mbare.
@@ -876,7 +876,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">02</div>
-              <div className="step-icon">Ã°Å¸â€ºâ€™</div>
+              <div className="step-icon">🛒</div>
               <h3>Order</h3>
               <p>
                 Choose what you need and place your order online.
@@ -885,7 +885,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">03</div>
-              <div className="step-icon">âœ“</div>
+              <div className="step-icon">✓</div>
               <h3>Seller Prepares</h3>
               <p>
                 Your local seller receives and prepares your order.
@@ -894,7 +894,7 @@ function App() {
 
             <div className="step">
               <div className="step-number">04</div>
-              <div className="step-icon">Ã°Å¸Å¡Å¡</div>
+              <div className="step-icon">&#128666;</div>
               <h3>Delivered</h3>
               <p>
                 A local rider brings your purchase directly to you.
@@ -916,7 +916,7 @@ function App() {
             <div className="seller-copy">
 
               <span className="eyebrow light">
-                FOR MBARÃ‰ BUSINESSES
+                FOR MBARÉ BUSINESSES
               </span>
 
               <h2>
@@ -942,7 +942,7 @@ function App() {
                 </div>
 
                 <div>
-                  <strong>Ã¢Ë†Å¾</strong>
+                  <strong>&infin;</strong>
                   <span>Growth potential</span>
                 </div>
 
@@ -955,7 +955,7 @@ function App() {
                 }
               >
                 Start Selling
-                <span>â†’</span>
+                <span>→</span>
               </button>
 
             </div>
@@ -1168,7 +1168,7 @@ function App() {
                   openModal("about")
                 }
               >
-                Explore Our Vision â†’
+                Explore Our Vision →
               </button>
 
             </div>
@@ -1292,10 +1292,10 @@ function App() {
               {cart.length === 0 ? <p>Your cart is empty. Browse the marketplace and add products to begin.</p> : <>
                 <div className="mm-cart-list">{cart.map((item) => <div className="mm-cart-row" key={item.id}>
                   <img src={item.image} alt=""/><div className="mm-cart-info"><strong>{item.name}</strong><small>{item.currency || "USD"} {item.price.toFixed(2)} each</small>
-                  <div className="mm-quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity">Ã¢Ë†â€™</button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity">+</button><button className="mm-remove" onClick={() => removeCartItem(item.id)}>Remove</button></div></div>
+                  <div className="mm-quantity"><button onClick={() => updateQuantity(item.id, -1)} aria-label="Decrease quantity">&#8722;</button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, 1)} aria-label="Increase quantity">+</button><button className="mm-remove" onClick={() => removeCartItem(item.id)}>Remove</button></div></div>
                   <strong>{item.currency || "USD"} {(item.price * item.quantity).toFixed(2)}</strong></div>)}</div>
                 <div className="mm-cart-total"><span>Subtotal</span><strong>{cart[0]?.currency || "USD"} {cartTotal.toFixed(2)}</strong></div>
-                <button className="primary-button mm-full-button" onClick={() => { if (!session?.token) { setModal("login"); setFormError("Please sign in before checkout."); } else { setModal("checkout"); setFormError(""); } }}>Continue to checkout â†’</button>
+                <button className="primary-button mm-full-button" onClick={() => { if (!session?.token) { setModal("login"); setFormError("Please sign in before checkout."); } else { setModal("checkout"); setFormError(""); } }}>Continue to checkout →</button>
               </>}
             </>}
             {(modal === "login" || modal === "account" || modal === "register" || modal === "seller" || modal === "rider") && <>
