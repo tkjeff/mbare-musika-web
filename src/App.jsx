@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { apiRequest, getSavedSession, saveSession, clearSession } from "./api.js";
 import "./App.css";
 import ManagementDashboard from "./ManagementDashboard.jsx";
+import RiderDashboard from './pages/dashboards/RiderDashboard.jsx'
 import AccountPortal from "./AccountPortal.jsx";
 import SellerDashboard from "./SellerDashboard.jsx";
 
@@ -286,7 +287,7 @@ function App() {
 
   return (
     <>
-      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/seller" ? <SellerDashboard /> : ["/account", "/login", "/rider"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
+      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/seller" ? <SellerDashboard /> : ["/account", "/login"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
       <div className="app">
 
       {notification && (
