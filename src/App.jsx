@@ -287,7 +287,7 @@ function App() {
 
   return (
     <>
-      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/rider" ? <RiderDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/seller" ? <SellerDashboard /> : ["/account", "/login"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
+      {["/management", "/owner"].includes(window.location.pathname.replace(/\/+$/, "")) ? <ManagementDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/rider" ? <RiderDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/rider" ? <RiderDashboard /> : window.location.pathname.replace(/\/+$/, "") === "/seller" ? <SellerDashboard /> : ["/account", "/login"].includes(window.location.pathname.replace(/\/+$/, "")) ? <AccountPortal /> : (
       <div className="app">
 
       {notification && (
@@ -1338,6 +1338,7 @@ function App() {
 export default App;
 
 // Mbare Musika seller dashboard deployment refresh
+
 
 
 
